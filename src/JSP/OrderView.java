@@ -5,257 +5,358 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.Document;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 import OrderRegistration.Customer;
+import OrderRegistration.Item;
+import OrderRegistration.Menu;
 import OrderRegistration.Order;
+import OrderRegistration.Receipt;
 
 @SuppressWarnings("serial")
 public class OrderView extends JFrame implements ActionListener {
-	private JLabel lblMenu, lblName, lblType, lblDate;
-	private JLabel customerName, customerType, date;
-	private JButton buttonPizza, buttonChicken, buttonFries,
-	buttonSprite, buttonPepsi, buttonWater, buttonStudent, 
-	buttonProfessor;
-	private JTextField txtName, txtType;
-	private JPanel menuPanel1, customerPanel, itemPanel, datePanel, 
-	panel, panel2, panel3;
-	private JRadioButton studentButton, professorButton;
-	private ButtonGroup group;
+	private JLabel lblMenu, lblName, lblDate, lblItem, lblPrice, lblStatus, lblSubtotal, 
+			lblDiscount, lblTotal, lblCounter;
+	private JButton buttonPizza, buttonChicken, buttonBurger, buttonSandwich, buttonFries,
+			buttonCookie, buttonIceCream, buttonBeverage, buttonWater;
+	private JButton buttonClear, buttonCheckout, buttonReceipt;
+	private JTextField txtName;
+	private JTextArea txtItem;
+	private JPanel menuPanel, customerPanel, itemPanel, checkoutPanel;
+	private JComboBox<String> comboBox;
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem saveItem;
+	private JScrollPane scroll;
 	
+	private SessionFactory factory;
+	private Session session;
+
+	private String customerList[] = { "Student", "Professor" };
+
+	// OrderRegistration objects
 	private Customer customer;
 	private Order order;
+	private Item item;
+	private Menu menu;
+	private Receipt receipt;
+	private List<Item> itemsList;
 
 	public OrderView() {
-			this.initializeComponents();
-			this.buildUI();	
-		}
+		menu = new Menu();
+		itemsList = new ArrayList<Item>();
+		
+		// initialize JFrame components
+		this.setTitle("Order Registration");
+		this.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50));
+		this.setBounds(100, 100, 900, 900);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setResizable(false);
+		this.setVisible(true);
+
+		this.initializeComponents();
+		this.buildUI();
+	}
 
 	private void initializeComponents() {
+		
+		// initialize panels
+		
+		// menu panel
+		menuPanel = new JPanel();
+		menuPanel.setPreferredSize(new Dimension(350, 350));
+		menuPanel.setBackground(Color.lightGray);
+		menuPanel.setLayout(new GridLayout(3, 3, 5, 5));
+		menuPanel.setBorder(new TitledBorder("Menu"));
 
+		// customer panel
+		customerPanel = new JPanel();
+		customerPanel.setPreferredSize(new Dimension(350, 350));
+		customerPanel.setBackground(Color.lightGray);
+		customerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		customerPanel.setBorder(new TitledBorder("Customer"));
+
+		// item panel
+		itemPanel = new JPanel();
+		itemPanel.setPreferredSize(new Dimension(350, 350));
+		itemPanel.setBackground(Color.lightGray);
+		itemPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 10));
+		itemPanel.setBorder(new TitledBorder("Items"));
+		
+		// checkout panel
+		checkoutPanel = new JPanel();
+		checkoutPanel.setPreferredSize(new Dimension(350, 350));
+		checkoutPanel.setBackground(Color.lightGray);
+		checkoutPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 130, 30));
+		checkoutPanel.setBorder(new TitledBorder("Checkout"));
+
+		
 		// initialize labels
-		lblMenu = new JLabel("Menu");
-		lblMenu.setLayout(new FlowLayout());
-		lblMenu.setFont(new Font("Arial", Font.PLAIN, 20));
-		lblMenu.setBounds(175, 15, 50, 25);
+		lblName = new JLabel("Name:");
+		lblItem = new JLabel("Items");
+		lblStatus = new JLabel("Status: ");
+		lblSubtotal = new JLabel("Subtotal: ");
+		lblDiscount = new JLabel("Discount: ");
+		lblTotal = new JLabel("Total:		");
 		
-		lblName = new JLabel("Name:   	");
-		lblName.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblName.setLayout(null);
-		lblName.setBounds(30, 30, 75, 25);
+		lblCounter = new JLabel("Counter");
+		lblCounter.setForeground(Color.RED);
 		
-		lblType = new JLabel("Type:   	");
-		lblType.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblType.setBounds(0, 0, 75, 75);
-		
-		lblDate = new JLabel("Date:	");
-		lblDate.setFont(new Font("Arial", Font.PLAIN, 18));
-		lblDate.setBounds(0, 0, 75, 75);
+		//lblPrice = new JLabel("Price");
 		
 		// initialize text fields
-		txtName = new JTextField(23);
-		txtName.setLayout(null);
-		txtName.setBounds(100, 30, 150, 30);
+		txtName = new JTextField(20);
 		
-		/*
-		customerName = new JLabel(customer.getName());
-		customerType = new JLabel(customer.getType());
-		date = new JLabel(order.getDate());
-		*/
+		// initialize text area
+		txtItem = new JTextArea(10, 20);
+		txtItem.setEditable(false);
+		// txtItem.setWrapStyleWord(true);
+		
+	    scroll = new JScrollPane(txtItem);
+	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
 		// initialize buttons
 		
+		// menu buttons
 		buttonPizza = new JButton("Pizza");
-		buttonPizza.setLayout(new FlowLayout());
-		buttonPizza.setFont(new Font("Arial", Font.PLAIN, 18));
-		//buttonPizza.setBounds(25, 50, 100, 75);
 		buttonPizza.addActionListener(this);
 		
 		buttonChicken = new JButton("Chicken");
-		buttonChicken.setLayout(new FlowLayout());
-		buttonChicken.setFont(new Font("Arial", Font.PLAIN, 18));
-		//buttonChicken.setBounds(150, 50, 100, 75);
 		buttonChicken.addActionListener(this);
 		
+		buttonBurger = new JButton("Burger");
+		buttonBurger.addActionListener(this);
+		
+		buttonSandwich = new JButton("Sandwich");
+		buttonSandwich.addActionListener(this);
+		
 		buttonFries = new JButton("Fries");
-		buttonFries.setLayout(new FlowLayout());
-		buttonFries.setFont(new Font("Arial", Font.PLAIN, 18));
-		//buttonFries.setBounds(275, 50, 100, 75);
 		buttonFries.addActionListener(this);
 		
-		buttonSprite = new JButton("Sprite");
-		buttonSprite.setLayout(new FlowLayout());
-		buttonSprite.setFont(new Font("Arial", Font.PLAIN, 18));
-		buttonSprite.setBounds(25, 150, 100, 75);
-		buttonSprite.addActionListener(this);
+		buttonCookie = new JButton("Cookie");
+		buttonCookie.addActionListener(this);
 		
-		buttonPepsi = new JButton("Pepsi");
-		buttonPepsi.setLayout(new FlowLayout());
-		buttonPepsi.setFont(new Font("Arial", Font.PLAIN, 18));
-		buttonPepsi.setBounds(150, 150, 100, 75);
-		buttonPepsi.addActionListener(this);
+		buttonIceCream = new JButton("Ice Cream");
+		buttonIceCream.addActionListener(this);
+		
+		buttonBeverage = new JButton("Beverage");
+		buttonBeverage.addActionListener(this);
 		
 		buttonWater = new JButton("Water");
-		buttonWater.setLayout(new FlowLayout());
-		buttonWater.setFont(new Font("Arial", Font.PLAIN, 18));
-		buttonWater.setBounds(275, 150, 100, 75);
 		buttonWater.addActionListener(this);
 		
-		buttonStudent = new JButton("Student");
-		buttonStudent.setLayout(new FlowLayout());
-		buttonStudent.setFont(new Font("Arial", Font.PLAIN, 18));
-		buttonStudent.setBounds(25, 75, 100, 40);
-		buttonStudent.addActionListener(this);
+		buttonReceipt = new JButton("Print Receipt");
+		buttonReceipt.addActionListener(this);
 		
-		buttonProfessor = new JButton("Professor");
-		buttonProfessor.setLayout(new FlowLayout());
-		buttonProfessor.setFont(new Font("Arial", Font.PLAIN, 18));
-		buttonProfessor.setBounds(150, 75, 100, 40);
-		buttonProfessor.addActionListener(this);
+		// drop-down menu
+		comboBox = new JComboBox<String>(customerList);
+		comboBox.addActionListener(this);
 		
+		/*
+		// customer type radio buttons
 		studentButton = new JRadioButton("Student");
+		studentButton.addActionListener(this);
+		
 		professorButton = new JRadioButton("Professor");
+		professorButton.addActionListener(this);
 		
 		group = new ButtonGroup();
 		group.add(studentButton);
 		group.add(professorButton);
+		*/
 		
-		// initialize panels
-		menuPanel1 = new JPanel();
-		menuPanel1.setBackground(Color.red);
-		menuPanel1.setLayout(new FlowLayout());
-		menuPanel1.setBounds(0, 0, 400, 300);
-
-		customerPanel = new JPanel();
-		customerPanel.setBackground(Color.blue);
-		customerPanel.setLayout(new FlowLayout());
-		customerPanel.setBounds(0, 300, 400, 200);
-
-		itemPanel = new JPanel();
-		itemPanel.setBackground(Color.green);
-		itemPanel.setLayout(new FlowLayout());
-		itemPanel.setBounds(400, 0, 300, 300);
+		// menu bar
+		menuBar = new JMenuBar();
 		
-		datePanel = new JPanel();
-		datePanel.setBackground(Color.gray);
-		datePanel.setBounds(300, 0, 150, 150);
+		// file tab
+		fileMenu = new JMenu("File");	
 		
-		panel = new JPanel();
-		panel.setPreferredSize(new Dimension(300, 250));
-		panel.setBackground(Color.lightGray);
-		panel.setLayout(new FlowLayout());
+		// save tab
+		saveItem = new JMenuItem("Save");
+		saveItem.addActionListener(this);
 		
-		panel2 = new JPanel();
-		panel2.setPreferredSize(new Dimension(300, 250));
-		panel2.setBackground(Color.darkGray);
-		panel2.setLayout(new FlowLayout());
+		// other buttons
+		buttonClear = new JButton("Clear");
+		buttonClear.addActionListener(this);
 		
-		panel3 = new JPanel();
-		panel3.setPreferredSize(new Dimension(300, 250));
-		panel3.setBackground(Color.green);
-		panel3.setLayout(new FlowLayout());
+		buttonCheckout = new JButton("Checkout");
+		buttonCheckout.addActionListener(this);
 
 	}
 
 	private void buildUI() {
-
-		/*
+		
 		// add to menu panel
-		menuPanel1.add(lblMenu);
-		menuPanel1.add(buttonPizza);
-		menuPanel1.add(buttonChicken);
-		menuPanel1.add(buttonFries);
-		menuPanel1.add(buttonSprite);
-		menuPanel1.add(buttonPepsi);
-		menuPanel1.add(buttonWater);
-
+		menuPanel.add(buttonPizza);
+		menuPanel.add(buttonChicken);
+		menuPanel.add(buttonBurger);
+		menuPanel.add(buttonSandwich);
+		menuPanel.add(buttonFries);
+		menuPanel.add(buttonCookie);
+		menuPanel.add(buttonIceCream);
+		menuPanel.add(buttonBeverage);
+		menuPanel.add(buttonWater);
 		
 		// add to customer panel
 		customerPanel.add(lblName);
 		customerPanel.add(txtName);
-		customerPanel.add(buttonStudent);
-		customerPanel.add(buttonProfessor);
-		*/
+		customerPanel.add(comboBox);
 		
-
+		// add to item panel
+		itemPanel.add(scroll);
+		itemPanel.add(buttonClear);
+		itemPanel.add(buttonCheckout);
 		
-		// add to button panel
-	
-		/*
-		// add to date panel
-		datePanel.add(this.lblDate);
-		datePanel.add(this.date);
-		*/
+		// add to checkout panel
+		checkoutPanel.add(lblCounter);
+		checkoutPanel.add(lblSubtotal); 
+		checkoutPanel.add(lblDiscount); 
+		checkoutPanel.add(lblTotal);
+		checkoutPanel.add(buttonReceipt);
 		
-		/*
+		// add to menu bar
+		fileMenu.add(saveItem);
+		menuBar.add(fileMenu);
+		
 		// add to JFrame
-		this.add(menuPanel1);
-		this.add(customerPanel);
+		this.setJMenuBar(menuBar);
+		this.add(menuPanel);
 		this.add(itemPanel);
-		// this.add(buttonPanel);
-		 * 
-		 */
-		
-		
-		panel.add(new JButton("Pizza"));
-		panel.add(new JButton("Chicken"));
-		panel.add(new JButton("Fries"));
-		panel.add(new JButton("Sprite"));
-		panel.add(new JButton("Coke"));
-		panel.add(new JButton("Water"));
-		
-		panel2.add(new JLabel("Name"));
-		panel2.add(new JTextField(20));
-		panel2.add(studentButton);
-		panel2.add(professorButton);
-		
-		this.add(panel);
-		this.add(panel2);
-		// this.add(panel3);
-		
-		/*
-		this.getContentPane().add(panel4, BorderLayout.BEFORE_FIRST_LINE);
-		this.getContentPane().add(panel1, BorderLayout.CENTER, 1);
-		this.getContentPane().add(panel2, BorderLayout.CENTER, 2);
-		this.getContentPane().add(panel3, BorderLayout.SOUTH);
-		*/
-		
-		// initialize JFrame components
-		this.setTitle("Order Registration");
-		this.setLayout(new FlowLayout());
-		this.setBounds(100, 100, 800, 600);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setResizable(true);
-		this.setVisible(true);
+		this.add(customerPanel);
+		this.add(checkoutPanel);
+				
 	}
 	
 	public void actionPerformed(ActionEvent event) {
-		/*
-		if (event.getSource() == this.buttonSubmit) {
-			try {
-				
-				new OrderSuccessView(customer.getName());
-				dispose();
+		// configure session
+		factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Order.class)
+				.addAnnotatedClass(Item.class).addAnnotatedClass(Receipt.class).addAnnotatedClass(Customer.class)
+				.buildSessionFactory();
 
-			} catch (MessageException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-			}
-		} else {
-			this.txtName.setText("");
-			this.txtType.setText("");
+		session = factory.getCurrentSession();
+		session.beginTransaction();
+				
+		// get customer name
+		if (event.getSource() == comboBox) {
+			customer = new Customer(txtName.getText(), (String) comboBox.getSelectedItem());
+			session.save(customer);	
+			order = new Order(customer, "counter");
+			session.save(order);
 		}
-		*/
+			
+		// menu actions
+		if (event.getSource() == buttonPizza) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getPizzaPrice() + "	" + menu.getPizza());
+			item = new Item(menu.getPizza(), menu.getPizzaPrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonChicken) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getChickenPrice() + "	" + menu.getChicken());
+			item = new Item(menu.getChicken(), menu.getChickenPrice());
+			order.add(item);
+			session.save(item);
+
+		} else if (event.getSource() == buttonBurger) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getBurgerPrice() + "	" + menu.getBurger());
+			item = new Item(menu.getBurger(), menu.getBurgerPrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonSandwich) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getSandwichPrice() + "	" + menu.getSandwich());
+			item = new Item(menu.getSandwich(), menu.getSandwichPrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonFries) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getFriesPrice() + "	" + menu.getFries());
+			item = new Item(menu.getFries(), menu.getFriesPrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonCookie) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getCookiePrice() + "	" + menu.getCookie());
+			item = new Item(menu.getCookie(), menu.getCookiePrice());
+			order.add(item);
+			session.save(item);
+
+		} else if (event.getSource() == buttonIceCream) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getIceCreamPrice() + "	" + menu.getIceCream());
+			item = new Item(menu.getIceCream(), menu.getIceCreamPrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonBeverage) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getBeveragePrice() + "	" + menu.getBeverage());
+			item = new Item(menu.getBeverage(), menu.getBeveragePrice());
+			order.add(item);
+			session.save(item);
+			
+		} else if (event.getSource() == buttonWater) {
+			txtItem.setText(txtItem.getText() + "\n $" + menu.getWaterPrice() + "	" + menu.getWater());
+			item = new Item(menu.getWater(), menu.getWaterPrice());
+			order.add(item);
+			session.save(item);
+			
+		}
+		
+		//System.out.println(itemsList);
+		
+		// create receipt
+		receipt = new Receipt(order);
+		session.save(receipt);
+		
+		// item panel actions
+		if (event.getSource() == buttonClear) {
+			txtItem.setText("");
+			itemsList.clear();
+		} else if (event.getSource() == buttonCheckout) {
+			lblSubtotal.setText("Subtotal:		" + String.format("%.2f", receipt.getSubtotal()));
+			lblDiscount.setText("Discount:		" + String.format("%.2f", receipt.getDiscount()));
+			lblTotal.setText("Total:		" + String.format("%.2f", receipt.getTotalPrice()));
+			
+			order.setTotalPrice(receipt.getTotalPrice());
+			System.out.println(receipt);
+		}
+		
+		if (event.getSource() == buttonReceipt) {
+			new ReceiptView(receipt);
+		}
+		
+		session.getTransaction().commit();	
+		
 	}
 	
 }

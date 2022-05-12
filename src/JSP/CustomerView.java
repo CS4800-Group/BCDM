@@ -5,12 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import OrderRegistration.Customer;
 
 @SuppressWarnings("serial")
 public class CustomerView extends JFrame implements ActionListener {
@@ -30,7 +26,7 @@ public class CustomerView extends JFrame implements ActionListener {
 		this.buttonOrders = new JButton("Order History");
 		this.buttonOrders.addActionListener(this);
 		
-		this.buttonManagement = new JButton("Management");
+		this.buttonManagement = new JButton("Reports");
 		this.buttonManagement.addActionListener(this);
 
 		this.panel1 = new JPanel();
@@ -54,7 +50,7 @@ public class CustomerView extends JFrame implements ActionListener {
 		this.getContentPane().add(panel3, BorderLayout.SOUTH);
 
 		this.setTitle("Bronco Centerpointe Dining");
-		this.setBounds(350, 140, 550, 200);
+		this.setBounds(100, 100, 550, 200);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setVisible(true);

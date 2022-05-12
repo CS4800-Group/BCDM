@@ -57,7 +57,6 @@ public class Order {
 		setCustomerName(customer.getName());
 		setStatus(status);
 		calculateDiscount(customer);
-		setTotalPrice();
 		setDate();
 	}
 	
@@ -74,9 +73,9 @@ public class Order {
 	}
 	
 	public void calculateDiscount(Customer customer) {
-		if (customer.getType().equals("student")) {
+		if (customer.getType().equalsIgnoreCase("student")) {
 			setDiscount(0.5);
-		} else if (customer.getType().equals("professor")) {
+		} else if (customer.getType().equalsIgnoreCase("professor")) {
 			setDiscount(0.25);
 		}
 	}
@@ -133,10 +132,8 @@ public class Order {
 		return totalPrice;
 	}
 
-	public void setTotalPrice() {
-		for (int i = 0; i < items.size(); i++) {
-			totalPrice = totalPrice + items.get(i).getPrice();
-		}
+	public void setTotalPrice(double price) {
+		this.totalPrice = price;
 	}
 	
 	public String getDate() {
