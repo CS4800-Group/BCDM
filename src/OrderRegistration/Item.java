@@ -38,7 +38,6 @@ public class Item {
 		this.price = price;
 	}
 	
-	
 	public Order getOrder() {
 		return order;
 	}
@@ -73,6 +72,6 @@ public class Item {
 
 	@Override
 	public String toString() {
-		return "\nItemID: " + itemID + ", Dish: " + name + ", Price: " + price + "\n";
+		return "\n" + name + ", $" + price + "\n";
 	}
 }

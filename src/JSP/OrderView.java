@@ -1,38 +1,27 @@
 package JSP;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.Document;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -46,11 +35,11 @@ import OrderRegistration.Receipt;
 
 @SuppressWarnings("serial")
 public class OrderView extends JFrame implements ActionListener {
-	private JLabel lblMenu, lblName, lblDate, lblItem, lblPrice, lblStatus, lblSubtotal, 
+	private JLabel lblName, lblSubtotal, 
 			lblDiscount, lblTotal, lblCounter;
 	private JButton buttonPizza, buttonChicken, buttonBurger, buttonSandwich, buttonFries,
 			buttonCookie, buttonIceCream, buttonBeverage, buttonWater;
-	private JButton buttonClear, buttonCheckout, buttonReceipt;
+	private JButton buttonClear, buttonCheckout, buttonReceipt, buttonBack;
 	private JTextField txtName;
 	private JTextArea txtItem;
 	private JPanel menuPanel, customerPanel, itemPanel, checkoutPanel;
@@ -59,10 +48,8 @@ public class OrderView extends JFrame implements ActionListener {
 	private JMenu fileMenu;
 	private JMenuItem saveItem;
 	private JScrollPane scroll;
-	
 	private SessionFactory factory;
 	private Session session;
-
 	private String customerList[] = { "Student", "Professor" };
 
 	// OrderRegistration objects
@@ -90,7 +77,6 @@ public class OrderView extends JFrame implements ActionListener {
 	}
 
 	private void initializeComponents() {
-		
 		// initialize panels
 		
 		// menu panel
@@ -120,12 +106,9 @@ public class OrderView extends JFrame implements ActionListener {
 		checkoutPanel.setBackground(Color.lightGray);
 		checkoutPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 130, 30));
 		checkoutPanel.setBorder(new TitledBorder("Checkout"));
-
 		
 		// initialize labels
 		lblName = new JLabel("Name:");
-		lblItem = new JLabel("Items");
-		lblStatus = new JLabel("Status: ");
 		lblSubtotal = new JLabel("Subtotal: ");
 		lblDiscount = new JLabel("Discount: ");
 		lblTotal = new JLabel("Total:		");
@@ -178,23 +161,10 @@ public class OrderView extends JFrame implements ActionListener {
 		
 		buttonReceipt = new JButton("Print Receipt");
 		buttonReceipt.addActionListener(this);
-		
+
 		// drop-down menu
 		comboBox = new JComboBox<String>(customerList);
 		comboBox.addActionListener(this);
-		
-		/*
-		// customer type radio buttons
-		studentButton = new JRadioButton("Student");
-		studentButton.addActionListener(this);
-		
-		professorButton = new JRadioButton("Professor");
-		professorButton.addActionListener(this);
-		
-		group = new ButtonGroup();
-		group.add(studentButton);
-		group.add(professorButton);
-		*/
 		
 		// menu bar
 		menuBar = new JMenuBar();
@@ -212,11 +182,12 @@ public class OrderView extends JFrame implements ActionListener {
 		
 		buttonCheckout = new JButton("Checkout");
 		buttonCheckout.addActionListener(this);
-
+		
+		buttonBack = new JButton("Back");
+		buttonBack.addActionListener(this);
 	}
 
 	private void buildUI() {
-		
 		// add to menu panel
 		menuPanel.add(buttonPizza);
 		menuPanel.add(buttonChicken);
@@ -232,6 +203,7 @@ public class OrderView extends JFrame implements ActionListener {
 		customerPanel.add(lblName);
 		customerPanel.add(txtName);
 		customerPanel.add(comboBox);
+		customerPanel.add(buttonBack);
 		
 		// add to item panel
 		itemPanel.add(scroll);
@@ -254,8 +226,7 @@ public class OrderView extends JFrame implements ActionListener {
 		this.add(menuPanel);
 		this.add(itemPanel);
 		this.add(customerPanel);
-		this.add(checkoutPanel);
-				
+		this.add(checkoutPanel);			
 	}
 	
 	public void actionPerformed(ActionEvent event) {
@@ -267,12 +238,18 @@ public class OrderView extends JFrame implements ActionListener {
 		session = factory.getCurrentSession();
 		session.beginTransaction();
 				
-		// get customer name
+		// get customer name from drop down list
 		if (event.getSource() == comboBox) {
 			customer = new Customer(txtName.getText(), (String) comboBox.getSelectedItem());
 			session.save(customer);	
 			order = new Order(customer, "counter");
 			session.save(order);
+		}
+		
+		// back button
+		if (event.getSource() == buttonBack) {
+			new WelcomeView();
+			dispose();
 		}
 			
 		// menu actions
@@ -328,12 +305,9 @@ public class OrderView extends JFrame implements ActionListener {
 			txtItem.setText(txtItem.getText() + "\n $" + menu.getWaterPrice() + "	" + menu.getWater());
 			item = new Item(menu.getWater(), menu.getWaterPrice());
 			order.add(item);
-			session.save(item);
-			
+			session.save(item);		
 		}
-		
-		//System.out.println(itemsList);
-		
+				
 		// create receipt
 		receipt = new Receipt(order);
 		session.save(receipt);
@@ -355,8 +329,6 @@ public class OrderView extends JFrame implements ActionListener {
 			new ReceiptView(receipt);
 		}
 		
-		session.getTransaction().commit();	
-		
-	}
-	
+		session.getTransaction().commit();			
+	}	
 }

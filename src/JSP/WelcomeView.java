@@ -1,20 +1,24 @@
 package JSP;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import OrderRegistration.OrderHistory;
+import OrderRegistration.Receipt;
+
 @SuppressWarnings("serial")
-public class CustomerView extends JFrame implements ActionListener {
+public class WelcomeView extends JFrame implements ActionListener {
 
-	private JButton buttonCreate, buttonOrders, buttonManagement;
+	private JButton buttonCreate, buttonOrders;
 	private JPanel panel1, panel2, panel3;
+	private Receipt receipt;
 
-	public CustomerView() {
+	public WelcomeView() {
 			this.initializeComponents();
 			this.buildUI();
 		}
@@ -25,9 +29,6 @@ public class CustomerView extends JFrame implements ActionListener {
 
 		this.buttonOrders = new JButton("Order History");
 		this.buttonOrders.addActionListener(this);
-		
-		this.buttonManagement = new JButton("Reports");
-		this.buttonManagement.addActionListener(this);
 
 		this.panel1 = new JPanel();
 		this.panel1.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -43,7 +44,6 @@ public class CustomerView extends JFrame implements ActionListener {
 	private void buildUI() {
 		this.panel1.add(this.buttonCreate);
 		this.panel2.add(this.buttonOrders);
-		this.panel3.add(this.buttonManagement);
 		
 		this.getContentPane().add(panel1, BorderLayout.NORTH);
 		this.getContentPane().add(panel2, BorderLayout.CENTER);
@@ -57,22 +57,26 @@ public class CustomerView extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		new CustomerView();
+		new WelcomeView();
 	}
 
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == this.buttonCreate) {
-			try {
-
-				// Customer customer = new Customer(txtName.getText(), txtType.getText());
-				
-				new OrderView();
-				dispose();
-
-			} catch (MessageException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-			}
+			new OrderView();
+			dispose();
+		} else if (event.getSource() == this.buttonOrders ) {
+			new OrderHistory();
 		}
 	}
+
+	public Receipt getReceipt() {
+		return receipt;
+	}
+
+	public void setReceipt(Receipt receipt) {
+		this.receipt = receipt;
+	}
+	
+	
 
 }

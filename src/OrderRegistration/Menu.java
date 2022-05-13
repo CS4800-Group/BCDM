@@ -186,6 +186,4 @@ public class Menu {
 	public void setWaterPrice(double waterPrice) {
 		this.waterPrice = waterPrice;
 	}
-	
-	
 }
