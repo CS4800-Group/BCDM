@@ -1,4 +1,4 @@
-package OrderRegistration;
+package orderRegistration;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

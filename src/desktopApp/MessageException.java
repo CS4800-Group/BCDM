@@ -1,4 +1,4 @@
-package JSP;
+package desktopApp;
 
 @SuppressWarnings("serial")
 public class MessageException extends RuntimeException {

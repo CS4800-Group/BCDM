@@ -1,4 +1,4 @@
-package JSP;
+package desktopApp;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,11 +27,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import OrderRegistration.Customer;
-import OrderRegistration.Item;
-import OrderRegistration.Menu;
-import OrderRegistration.Order;
-import OrderRegistration.Receipt;
+import orderRegistration.Customer;
+import orderRegistration.Item;
+import orderRegistration.Menu;
+import orderRegistration.Order;
+import orderRegistration.Receipt;
 
 @SuppressWarnings("serial")
 public class OrderView extends JFrame implements ActionListener {
@@ -303,10 +303,6 @@ public class OrderView extends JFrame implements ActionListener {
 			order.add(item);
 			session.save(item);		
 		}
-				
-		// create receipt
-		receipt = new Receipt(order);
-		session.save(receipt);
 		
 		// item panel actions
 		if (event.getSource() == buttonClear) {
@@ -315,10 +311,14 @@ public class OrderView extends JFrame implements ActionListener {
 		}
 		
 		if (event.getSource() == buttonCheckout) {
+			// create receipt
+			receipt = new Receipt(order);
+			
 			lblSubtotal.setText("Subtotal:		" + String.format("%.2f", receipt.getSubtotal()));
 			lblDiscount.setText("Discount:		" + String.format("%.2f", receipt.getDiscount()));
 			lblTotal.setText("Total:		" + String.format("%.2f", receipt.getTotalPrice()));
 			
+			session.save(receipt);
 			order.setTotalPrice(receipt.getTotalPrice());
 			new ReceiptView(receipt);
 		}

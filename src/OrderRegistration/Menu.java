@@ -1,4 +1,4 @@
-package OrderRegistration;
+package orderRegistration;
 
 public class Menu {
 	private String pizza;

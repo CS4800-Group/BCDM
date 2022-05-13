@@ -1,4 +1,4 @@
-package JSP;
+package desktopApp;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -8,8 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import OrderRegistration.OrderHistory;
-import OrderRegistration.Receipt;
+import orderRegistration.Receipt;
 
 @SuppressWarnings("serial")
 public class WelcomeView extends JFrame implements ActionListener {

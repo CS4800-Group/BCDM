@@ -1,4 +1,4 @@
-package OrderRegistration;
+package desktopApp;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,7 +23,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import JSP.WelcomeView;
+import orderRegistration.Customer;
+import orderRegistration.Item;
+import orderRegistration.Order;
+import orderRegistration.Receipt;
 
 @SuppressWarnings("serial")
 public class OrderHistory extends JFrame implements ActionListener {
