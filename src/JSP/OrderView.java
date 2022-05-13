@@ -39,7 +39,7 @@ public class OrderView extends JFrame implements ActionListener {
 			lblDiscount, lblTotal, lblCounter;
 	private JButton buttonPizza, buttonChicken, buttonBurger, buttonSandwich, buttonFries,
 			buttonCookie, buttonIceCream, buttonBeverage, buttonWater;
-	private JButton buttonClear, buttonCheckout, buttonReceipt, buttonBack;
+	private JButton buttonClear, buttonCheckout, buttonBack;
 	private JTextField txtName;
 	private JTextArea txtItem;
 	private JPanel menuPanel, customerPanel, itemPanel, checkoutPanel;
@@ -158,9 +158,6 @@ public class OrderView extends JFrame implements ActionListener {
 		
 		buttonWater = new JButton("Water");
 		buttonWater.addActionListener(this);
-		
-		buttonReceipt = new JButton("Print Receipt");
-		buttonReceipt.addActionListener(this);
 
 		// drop-down menu
 		comboBox = new JComboBox<String>(customerList);
@@ -215,7 +212,6 @@ public class OrderView extends JFrame implements ActionListener {
 		checkoutPanel.add(lblSubtotal); 
 		checkoutPanel.add(lblDiscount); 
 		checkoutPanel.add(lblTotal);
-		checkoutPanel.add(buttonReceipt);
 		
 		// add to menu bar
 		fileMenu.add(saveItem);
@@ -316,16 +312,14 @@ public class OrderView extends JFrame implements ActionListener {
 		if (event.getSource() == buttonClear) {
 			txtItem.setText("");
 			itemsList.clear();
-		} else if (event.getSource() == buttonCheckout) {
+		}
+		
+		if (event.getSource() == buttonCheckout) {
 			lblSubtotal.setText("Subtotal:		" + String.format("%.2f", receipt.getSubtotal()));
 			lblDiscount.setText("Discount:		" + String.format("%.2f", receipt.getDiscount()));
 			lblTotal.setText("Total:		" + String.format("%.2f", receipt.getTotalPrice()));
 			
 			order.setTotalPrice(receipt.getTotalPrice());
-			System.out.println(receipt);
-		}
-		
-		if (event.getSource() == buttonReceipt) {
 			new ReceiptView(receipt);
 		}
 		
